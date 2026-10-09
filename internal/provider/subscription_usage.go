@@ -843,13 +843,32 @@ func codexWindows(ctx context.Context, token, accountID string) (plan string, ou
 	if data.Resets != nil {
 		resets = codexResets(ctx, base, token, accountID, data.Resets.Available)
 	}
-	if data.RateLimit.Primary != nil {
-		out = append(out, data.RateLimit.Primary.window())
-	}
-	if data.RateLimit.Secondary != nil {
-		out = append(out, data.RateLimit.Secondary.window())
+	for _, w := range []*codexWindow{data.RateLimit.Primary, data.RateLimit.Secondary} {
+		if w == nil || codexPhantomFiveHour(data.PlanType, w) {
+			continue
+		}
+		out = append(out, w.window())
 	}
 	return data.PlanType, out, resets, credits, codexHeld(data), nil
+}
+
+// codexNoFiveHour are the plan_type values ChatGPT gives no five-hour
+// allowance: Pro, and a Business Premium seat. /wham/usage still returns
+// a five-hour window for them, often already full, which would take the
+// account out of rotation while its week has room. self_serve_business_prolite
+// is that seat (OpenAI's slug); personal prolite is not, and neither is
+// Plus, Team or a bare business workspace.
+var codexNoFiveHour = []string{"pro", "self_serve_business_prolite"}
+
+// codexPhantomFiveHour reports whether w is the five-hour window a plan
+// in codexNoFiveHour doesn't have. A week that arrives as the primary
+// window (limit_window_seconds of seven days, as a Pro account's
+// /wham/usage does) is kept.
+func codexPhantomFiveHour(plan string, w *codexWindow) bool {
+	if w == nil || w.LimitWindowSecs != 5*60*60 {
+		return false
+	}
+	return slices.Contains(codexNoFiveHour, strings.ToLower(strings.TrimSpace(plan)))
 }
 
 // codexUsage is what /wham/usage tells of a ChatGPT account.

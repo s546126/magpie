@@ -48,7 +48,8 @@ func TestAllowancesBeforeFirstReading(t *testing.T) {
 			w.WriteHeader(503)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+		// plus keeps the five-hour window this counts; Pro would drop it
+		json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 			"primary_window": map[string]any{"used_percent": used[r.Header.Get("chatgpt-account-id")], "limit_window_seconds": 18000}}})
 	}))
 	t.Cleanup(fake.Close)

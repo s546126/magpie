@@ -35,7 +35,8 @@ func TestCachedCardsTellBackgroundReadings(t *testing.T) {
 			return
 		}
 		asked.Add(1)
-		w.Write([]byte(`{"plan_type":"pro","rate_limit":{"allowed":true,"limit_reached":false,
+		// plus keeps the five-hour window this card's first reading is; Pro would drop it
+		w.Write([]byte(`{"plan_type":"plus","rate_limit":{"allowed":true,"limit_reached":false,
 			"primary_window":{"used_percent":37,"limit_window_seconds":18000,"reset_after_seconds":3600},
 			"secondary_window":{"used_percent":12,"limit_window_seconds":604800,"reset_after_seconds":86400}}}`))
 	}))
