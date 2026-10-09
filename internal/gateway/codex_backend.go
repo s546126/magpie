@@ -457,16 +457,10 @@ func codexAccounts(r *http.Request, model string) (string, bool) {
 	pinned := h.Get(AccountHeader) != ""
 	// an account with a usage cap, or set not to spend its credits, goes
 	// through routing, which holds it there, even alone: relayed as it
-	// came, nothing would
-	if ok && p.Account != nil && p.Account.Agent == "codex" {
-		if share, _ := provider.HoldShare(p, "codex", p.Account.User); share > 0 {
-			return id, true
-		}
-		// outside the hours set on it, the same: relayed as it came, the
-		// sign-in would be spent while the window says it is off
-		if _, shut := p.HoursGate(p.Account.User, time.Now()); shut {
-			return id, true
-		}
+	// came, nothing would. Outside the hours set on it, the same: relayed
+	// as it came, the sign-in would be spent while the window says it is off.
+	if ok && p.Account != nil && p.Account.Agent == "codex" && (codexHeld(p) || !accountWithinHours(p)) {
+		return id, true
 	}
 	// the key's holds are served, not relayed past: a key held to some
 	// models or accounts goes through routing, which holds it to them,
@@ -482,6 +476,23 @@ func codexAccounts(r *http.Request, model string) (string, bool) {
 		return "", false
 	}
 	return id, true
+}
+
+// codexHeld says the signed-in account is held by a usage cap or by being
+// set not to spend its credits, so a lone account still goes through routing.
+func codexHeld(p provider.Provider) bool {
+	share, _ := provider.HoldShare(p, "codex", p.Account.User)
+	return share > 0
+}
+
+// accountWithinHours says the signed-in account is inside the hours set on
+// it. An account with no hours is.
+func accountWithinHours(p provider.Provider) bool {
+	if p.Account == nil {
+		return true
+	}
+	_, shut := p.HoursGate(p.Account.User, time.Now())
+	return !shut
 }
 
 // withModel is a request body asking for another model.
