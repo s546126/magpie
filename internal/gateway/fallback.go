@@ -49,6 +49,10 @@ type candidate struct {
 	rank int
 	// capped is set on an account left out as held at its usage cap
 	capped *capHold
+	// hoursShut is set on an account or key left out as outside the hours
+	// set on it; hours says when it is back and how the schedule reads
+	hoursShut bool
+	hours     provider.HoursGate
 }
 
 // capHold is how an account is held at its usage cap: the cap, the share
@@ -187,6 +191,17 @@ func perKeyBarred(p provider.Provider, model string, from provider.Protocol) (ou
 			barred = append(barred, c)
 			return true
 		})
+		// an account outside the hours set on it is passed over until the
+		// window opens: not deleted, its sign-in unchanged (provider/hours.go)
+		all = slices.DeleteFunc(all, func(c candidate) bool {
+			g, shut := c.p.HoursGate(c.p.Account.User, time.Now())
+			if !shut {
+				return false
+			}
+			c.hoursShut, c.hours = true, g
+			barred = append(barred, c)
+			return true
+		})
 		// an account at its usage cap is used up for routing until the
 		// window it filled renews: never tried, so groups, fallbacks and
 		// the other accounts take the request (provider/account_caps.go);
@@ -228,6 +243,10 @@ func perKeyBarred(p provider.Provider, model string, from provider.Protocol) (ou
 		}
 		if !p.AccountServes(provider.KeyID(k.Key), model) {
 			barred = append(barred, candidate{p: q, model: model, rest: rest, rank: i})
+			continue
+		}
+		if g, shut := p.HoursGate(provider.KeyID(k.Key), time.Now()); shut {
+			barred = append(barred, candidate{p: q, model: model, rest: rest, rank: i, hoursShut: true, hours: g})
 			continue
 		}
 		if !p.Serves(k, model) {
@@ -586,17 +605,74 @@ func barredOf(cs []candidate, q provider.Provider, fallback bool, from provider.
 	for _, c := range cs {
 		w := weighed(c, q, weighing{}, fallback, from)
 		w.Unlisted, w.Via = true, via
-		if h := c.capped; h != nil {
+		switch {
+		case c.hoursShut:
+			w.Closed, w.ClosedText = true, c.hours.Text
+			if !c.hours.Back.IsZero() {
+				back := c.hours.Back
+				w.ClosedUntil = &back
+			}
+		case c.capped != nil:
+			h := c.capped
 			w.Capped, w.Used, w.NoCredits = h.cap, h.used, h.noCredits
 			if !h.back.IsZero() {
 				w.CapBack = &h.back
 			}
-		} else {
+		default:
 			w.Barred = true
 		}
 		out = append(out, w)
 	}
 	return out
+}
+
+// closedProvider is closedError for a provider whose own send, outside the
+// candidate plan, found every account or key of it closed.
+func closedProvider(p provider.Provider, model string) (string, time.Time) {
+	now := time.Now()
+	var ws []Weighed
+	for _, r := range p.AccountRefs() {
+		g, shut := p.HoursGate(r, now)
+		if !shut {
+			continue
+		}
+		w := Weighed{Name: p.Name, Who: r, Closed: true, ClosedText: g.Text}
+		if !g.Back.IsZero() {
+			back := g.Back
+			w.ClosedUntil = &back
+		}
+		ws = append(ws, w)
+	}
+	if len(ws) == 0 {
+		ws = []Weighed{{Name: p.Name, Closed: true, ClosedText: "outside its hours"}}
+	}
+	return closedError(model, ws)
+}
+
+// closedError says why a request for model went nowhere when every account
+// or key that could take it is outside the hours set on it. The soonest
+// one opens again is the wait.
+func closedError(model string, ws []Weighed) (string, time.Time) {
+	var held []string
+	var soonest time.Time
+	for _, w := range ws {
+		if !w.Closed {
+			continue
+		}
+		who := w.Who
+		if who == "" {
+			who = w.Name
+		}
+		s := fmt.Sprintf("%s (%s) is outside its hours (%s)", w.Name, who, w.ClosedText)
+		if w.ClosedUntil != nil {
+			s += ", until " + w.ClosedUntil.Local().Format("Jan 2 15:04")
+			if soonest.IsZero() || w.ClosedUntil.Before(soonest) {
+				soonest = *w.ClosedUntil
+			}
+		}
+		held = append(held, s)
+	}
+	return fmt.Sprintf("outside its hours: every account or key that could take %q is outside the hours set on it — %s. magpie uses it again when the window opens; the account and its key stay as they are (magpie provider hours)", model, strings.Join(held, "; ")), soonest
 }
 
 // barredError says why a request for model went nowhere when every account

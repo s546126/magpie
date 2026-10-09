@@ -216,6 +216,12 @@ type Weighed struct {
 	// NoCredits: held at 100% (Capped), a Codex account the user set not
 	// to spend its credits once its allowance is used up
 	NoCredits bool `json:"noCredits,omitempty"`
+	// Closed: left out as outside the hours set on the account or key.
+	// ClosedText is the schedule; ClosedUntil is when it takes requests
+	// again, when that is known.
+	Closed      bool       `json:"closed,omitempty"`
+	ClosedText  string     `json:"closedText,omitempty"`
+	ClosedUntil *time.Time `json:"closedUntil,omitempty"`
 	// Rank: its place in its provider's own list of accounts or keys, the
 	// order the provider's page shows and a drag sets (#217); routing may
 	// weigh them in another

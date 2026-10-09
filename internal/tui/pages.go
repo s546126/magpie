@@ -184,6 +184,34 @@ func (m model) updateProviders(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 		id := p.ID
 		return m, reseatCmd(func() error { return provider.SetOff(id, off) }, p.Name+" "+what)
+	case "h":
+		// the hours one account or key takes requests, the same line the
+		// CLI takes, applied to every account and key of this provider
+		id, name := p.ID, p.Name
+		in := newInput("clear, preset deepseek-offpeak, active 09:00-18:00, or off 22:00-06:00")
+		m.openAsk(ask{crumbs: []string{"providers", name, "hours"}, input: in,
+			hint: "sets every account and key · zone=UTC days=mon-fri are optional · a window past midnight is 22:00-06:00",
+			onEnter: func(v string) tea.Cmd {
+				h, clear, err := provider.ParseHours(strings.Fields(v))
+				if err != nil {
+					return func() tea.Msg { return flashMsg{text: err.Error()} }
+				}
+				return func() tea.Msg {
+					var err error
+					if clear {
+						err = provider.ClearAccountHours(id, "all")
+					} else {
+						err = provider.SetAccountHours(id, "all", h)
+					}
+					if err != nil {
+						return flashMsg{text: err.Error()}
+					}
+					if clear {
+						return flashMsg{text: name + " takes requests whenever it is switched on", ok: true}
+					}
+					return flashMsg{text: name + " · " + h.Text(), ok: true}
+				}
+			}})
 	case "t":
 		m.flash, m.flashOK = "testing "+p.Name+"…", true
 		return m, testCmd(p)
@@ -550,6 +578,9 @@ func (m model) viewProviders() string {
 		}
 		if p.Unlisted {
 			notes = append(notes, "groups only")
+		}
+		if note := p.HoursNote(); note != "" {
+			notes = append(notes, note)
 		}
 		r.note = strings.Join(notes, " · ")
 		// a plugin's account showing its defaults alone says why, as the

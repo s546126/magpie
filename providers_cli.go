@@ -42,6 +42,13 @@ const providerUsage = `usage:
   magpie provider account-cap <id> [account [percent|off]]
                                           use a subscription account up to a share of each usage window (e.g. 70):
                                           at it, routing takes the account for used up until the window renews
+  magpie provider hours <id> [account|key|all [clear | preset <name> | active|off <HH:MM-HH:MM>… [zone=<iana>] [days=<mon-fri>]]]
+                                          when one account or key takes requests. active: only inside the windows.
+                                          off 09:00-17:00: off inside them. A window whose end is not after its start
+                                          crosses midnight (22:00-06:00). Empty zone is this computer's time.
+                                          preset deepseek-offpeak is DeepSeek's published off-peak discount.
+                                          clear, or off alone, removes the schedule. The account stays saved.
+  magpie provider hours presets           list those built-in schedules
   magpie provider account-concurrency <id> [account|key [n|off|default]]
                                           how many requests one account or key has out at once, over every model,
                                           routing group and agent: its own, off for none, default for the provider's
@@ -489,6 +496,8 @@ func providerCmd(args []string) error {
 		return accountModelsCmd(rest)
 	case "account-cap", "account-caps":
 		return accountCapCmd(rest)
+	case "hours", "hour":
+		return accountHoursCmd(rest)
 	case "account-concurrency", "account-limit":
 		return accountConcurrencyCmd(rest)
 	case "queue":
@@ -708,6 +717,9 @@ func showProvider(p provider.Provider) error {
 		kv("key", muted.Render("none needed"))
 	default:
 		kv("key", amber.Render("not set")+muted.Render("  magpie provider key "+p.ID+" …"))
+	}
+	if lines := p.HoursSummary(); len(lines) > 0 {
+		kv("hours", strings.Join(lines, "; "))
 	}
 	kv("catalog", p.Catalog)
 	kv("website", p.Website)
@@ -1174,6 +1186,75 @@ func accountCapCmd(rest []string) error {
 		} else {
 			fmt.Println(r, muted.Render("· no cap: used to 100%"))
 		}
+	}
+	return nil
+}
+
+// accountHoursCmd shows, or sets, when a provider's accounts or keys take
+// requests (provider.Hours). Off alone, or clear, removes the schedule.
+func accountHoursCmd(rest []string) error {
+	if len(rest) == 1 && rest[0] == "presets" {
+		for _, id := range provider.HoursPresetIDs() {
+			h, _ := provider.HoursPreset(id)
+			note, _ := provider.HoursPresetNote(id)
+			fmt.Printf("%s · %s\n  %s\n", id, h.Text(), muted.Render(note))
+		}
+		return nil
+	}
+	if len(rest) < 1 {
+		return fmt.Errorf("magpie provider hours <id> [account|key|all [clear | preset <name> | active|off <HH:MM-HH:MM>…]]")
+	}
+	p, err := provider.Find(rest[0])
+	if err != nil {
+		return err
+	}
+	if len(rest) > 2 {
+		h, clear, err := provider.ParseHours(rest[2:])
+		if err != nil {
+			return err
+		}
+		if clear {
+			err = provider.ClearAccountHours(p.ID, rest[1])
+		} else {
+			err = provider.SetAccountHours(p.ID, rest[1], h)
+		}
+		if err != nil {
+			return err
+		}
+		if p, err = provider.Find(p.ID); err != nil {
+			return err
+		}
+	}
+	refs := p.AccountRefs()
+	if len(rest) > 1 && !strings.EqualFold(rest[1], "all") {
+		ref, ok := p.AccountRefOf(rest[1])
+		if !ok {
+			return fmt.Errorf("%s has no account or key %q", p.Name, rest[1])
+		}
+		refs = []string{ref}
+	}
+	if len(refs) == 0 {
+		fmt.Println(muted.Render(p.Name + " has no account or key"))
+		return nil
+	}
+	label := map[string]string{}
+	for _, k := range p.KeyList() {
+		if k.Name != "" {
+			label[k.ID] = k.Name + " " + muted.Render(k.Masked+" · "+k.ID)
+		} else {
+			label[k.ID] = k.Masked + " " + muted.Render(k.ID)
+		}
+	}
+	for _, r := range refs {
+		name := r
+		if l, ok := label[r]; ok {
+			name = l
+		}
+		if h, ok := p.HoursOf(r); ok {
+			fmt.Printf("%s · %s\n", name, h.Text())
+			continue
+		}
+		fmt.Println(name, muted.Render("· on whenever it is switched on"))
 	}
 	return nil
 }

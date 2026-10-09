@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/yetone/magpie/internal/access"
 	"github.com/yetone/magpie/internal/provider"
@@ -236,9 +237,14 @@ func allowedKey(who access.Identity, p provider.Provider, model string) (provide
 		return p, p.Account == nil || accountAllowed(who, candidate{p: p, model: model})
 	}
 	for _, k := range p.KeysOn() {
-		if q := p.WithKey(k); accountAllowed(who, candidate{p: q, model: model}) {
-			return q, true
+		q := p.WithKey(k)
+		if !accountAllowed(who, candidate{p: q, model: model}) {
+			continue
 		}
+		if _, shut := p.HoursGate(provider.KeyID(k.Key), time.Now()); shut {
+			continue
+		}
+		return q, true
 	}
 	return p, false
 }

@@ -405,9 +405,10 @@ func compactHeldError(who access.Identity, model string) string {
 // Use and the like, another doing the work). Its turns already go to the
 // others (codexAccounts, routing passing the paused one over); relayed as
 // it came, compaction alone still spent the paused account — and on
-// history the others sealed. The first not resting is taken, else the
-// first. nil keeps the relay to the sign-in: not paused, or nothing else
-// on, or Codex on an API key.
+// history the others sealed. The first not resting, and inside its hours,
+// is taken, else the first that is inside its hours. nil keeps the relay
+// to the sign-in: not paused, or nothing else on, or every other account
+// outside its hours, or Codex on an API key.
 func compactOn(r *http.Request, model string) *provider.Provider {
 	if model == "" || strings.Contains(model, "/") || apiKey(r.Header) || r.Header.Get(AccountHeader) != "" {
 		return nil
@@ -417,13 +418,22 @@ func compactOn(r *http.Request, model string) *provider.Provider {
 		return nil
 	}
 	others := p.AlsoOn()
+	open := func(o provider.Provider) bool {
+		if o.Account == nil {
+			return true
+		}
+		_, shut := o.HoursGate(o.Account.User, time.Now())
+		return !shut
+	}
 	for i, o := range others {
-		if !resting(candidate{p: o, model: model, rest: o.ID}) {
+		if open(o) && !resting(candidate{p: o, model: model, rest: o.ID}) {
 			return &others[i]
 		}
 	}
-	if len(others) > 0 {
-		return &others[0]
+	for i, o := range others {
+		if open(o) {
+			return &others[i]
+		}
 	}
 	return nil
 }
@@ -450,6 +460,11 @@ func codexAccounts(r *http.Request, model string) (string, bool) {
 	// came, nothing would
 	if ok && p.Account != nil && p.Account.Agent == "codex" {
 		if share, _ := provider.HoldShare(p, "codex", p.Account.User); share > 0 {
+			return id, true
+		}
+		// outside the hours set on it, the same: relayed as it came, the
+		// sign-in would be spent while the window says it is off
+		if _, shut := p.HoursGate(p.Account.User, time.Now()); shut {
 			return id, true
 		}
 	}

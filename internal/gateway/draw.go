@@ -579,12 +579,24 @@ func (s *Server) drawOnAccounts(ctx context.Context, r *http.Request, p provider
 		// a key of its own: the calling key's accounts hold it as one,
 		// drawn with a key it may use — of those in use, not the
 		// provider's first alone, which a key held to a later one was
-		// refused by — or none, refused
+		// refused by — or none, refused. A key outside its hours is not
+		// that one (hours.go): the next key that is inside them is, and
+		// when none is, the picture isn't asked.
+		base := p
 		if keyWho, held := accountHolds(r); held {
 			var ok bool
-			if p, ok = allowedKey(keyWho, p, model); !ok {
+			if p, ok = allowedKey(keyWho, base, model); !ok {
+				if _, open := base.FirstOpen(time.Now()); !open && base.Key != "" {
+					msg, back := closedProvider(base, model)
+					return base, drawn{}, http.StatusTooManyRequests, back, errors.New(msg)
+				}
 				return p, drawn{}, http.StatusForbidden, time.Time{}, errors.New(keyAccountsError(keyWho, d.Model))
 			}
+		} else if q, ok := base.FirstOpen(time.Now()); ok {
+			p = q
+		} else if base.Key != "" {
+			msg, back := closedProvider(base, model)
+			return base, drawn{}, http.StatusTooManyRequests, back, errors.New(msg)
 		}
 		out, code, err := s.draw(ctx, p, model, d)
 		return p, out, code, time.Time{}, err
@@ -612,6 +624,11 @@ func (s *Server) drawOnAccounts(ctx context.Context, r *http.Request, p provider
 	if len(cs) == 0 && slices.ContainsFunc(barred, func(c candidate) bool { return c.capped != nil }) {
 		// every account is held at its usage cap
 		msg, back := cappedError(model, barredOf(barred, q, false, provider.Chat, nil), time.Now())
+		return p, drawn{}, http.StatusTooManyRequests, back, errors.New(msg)
+	}
+	if len(cs) == 0 && len(barred) > 0 && !slices.ContainsFunc(barred, func(c candidate) bool { return !c.hoursShut }) {
+		// every account is outside the hours set on it
+		msg, back := closedError(model, barredOf(barred, q, false, provider.Chat, nil))
 		return p, drawn{}, http.StatusTooManyRequests, back, errors.New(msg)
 	}
 	if len(cs) == 0 {

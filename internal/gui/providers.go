@@ -1122,6 +1122,7 @@ func providerRoutes(mux *http.ServeMux, w Windows) {
 				// requests at once, with accountconcurrency
 				if old != nil {
 					in.AccountCaps = old.AccountCaps
+					in.AccountHours = old.AccountHours
 					in.AccountConcurrency = old.AccountConcurrency
 				}
 				// a Zhipu key's team likewise: {} clears it
