@@ -66,14 +66,37 @@ func (s *Server) retrieve(path, operation string) http.HandlerFunc {
 			return
 		}
 		call.To = provider.Chat
+		// a key or account outside its hours is not the one this goes to.
+		// A group is planned below, which skips the same way.
+		if !isGroup {
+			if q, ok := p.FirstOpen(time.Now()); ok {
+				p = q
+			} else if p.Key != "" || p.Account != nil {
+				msg, _ := closedProvider(p, asked)
+				call.Status, call.Error = 429, msg
+				writeError(w, provider.Chat, 429, msg)
+				s.record(call)
+				return
+			}
+		}
 		// a routing group's members are tried as its routing orders them,
 		// each account or key of theirs too (#773), the next asked when one
 		// fails: a member that serves no such API (404), one out of quota
 		// (429) or one whose vendor fails; a model is asked on its own
 		tries := []candidate{{p: p, model: model}}
 		if isGroup {
-			if cs, _ := s.planGroup(g.Live(), ms, provider.Chat); len(cs) > 0 {
+			cs, pl := s.planGroup(g.Live(), ms, provider.Chat)
+			if len(cs) > 0 {
 				tries = cs
+			} else if slices.ContainsFunc(pl.left, func(w Weighed) bool { return w.Closed }) &&
+				!slices.ContainsFunc(pl.left, func(w Weighed) bool {
+					return !w.Barred && !w.Held && !w.Closed && w.Capped == 0
+				}) {
+				msg, _ := closedError(asked, pl.left)
+				call.Status, call.Error = 429, "every account outside its hours"
+				writeError(w, provider.Chat, 429, msg)
+				s.record(call)
+				return
 			}
 		}
 		// the accounts or keys the calling key may not use are left out of

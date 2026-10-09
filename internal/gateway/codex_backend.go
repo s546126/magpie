@@ -405,9 +405,10 @@ func compactHeldError(who access.Identity, model string) string {
 // Use and the like, another doing the work). Its turns already go to the
 // others (codexAccounts, routing passing the paused one over); relayed as
 // it came, compaction alone still spent the paused account — and on
-// history the others sealed. The first not resting is taken, else the
-// first. nil keeps the relay to the sign-in: not paused, or nothing else
-// on, or Codex on an API key.
+// history the others sealed. The first not resting, and inside its hours,
+// is taken, else the first that is inside its hours. nil keeps the relay
+// to the sign-in: not paused, or nothing else on, or every other account
+// outside its hours, or Codex on an API key.
 func compactOn(r *http.Request, model string) *provider.Provider {
 	if model == "" || strings.Contains(model, "/") || apiKey(r.Header) || r.Header.Get(AccountHeader) != "" {
 		return nil
@@ -417,13 +418,22 @@ func compactOn(r *http.Request, model string) *provider.Provider {
 		return nil
 	}
 	others := p.AlsoOn()
+	open := func(o provider.Provider) bool {
+		if o.Account == nil {
+			return true
+		}
+		_, shut := o.HoursGate(o.Account.User, time.Now())
+		return !shut
+	}
 	for i, o := range others {
-		if !resting(candidate{p: o, model: model, rest: o.ID}) {
+		if open(o) && !resting(candidate{p: o, model: model, rest: o.ID}) {
 			return &others[i]
 		}
 	}
-	if len(others) > 0 {
-		return &others[0]
+	for i, o := range others {
+		if open(o) {
+			return &others[i]
+		}
 	}
 	return nil
 }
@@ -447,11 +457,10 @@ func codexAccounts(r *http.Request, model string) (string, bool) {
 	pinned := h.Get(AccountHeader) != ""
 	// an account with a usage cap, or set not to spend its credits, goes
 	// through routing, which holds it there, even alone: relayed as it
-	// came, nothing would
-	if ok && p.Account != nil && p.Account.Agent == "codex" {
-		if share, _ := provider.HoldShare(p, "codex", p.Account.User); share > 0 {
-			return id, true
-		}
+	// came, nothing would. Outside the hours set on it, the same: relayed
+	// as it came, the sign-in would be spent while the window says it is off.
+	if ok && p.Account != nil && p.Account.Agent == "codex" && (codexHeld(p) || !accountWithinHours(p)) {
+		return id, true
 	}
 	// the key's holds are served, not relayed past: a key held to some
 	// models or accounts goes through routing, which holds it to them,
@@ -467,6 +476,23 @@ func codexAccounts(r *http.Request, model string) (string, bool) {
 		return "", false
 	}
 	return id, true
+}
+
+// codexHeld says the signed-in account is held by a usage cap or by being
+// set not to spend its credits, so a lone account still goes through routing.
+func codexHeld(p provider.Provider) bool {
+	share, _ := provider.HoldShare(p, "codex", p.Account.User)
+	return share > 0
+}
+
+// accountWithinHours says the signed-in account is inside the hours set on
+// it. An account with no hours is.
+func accountWithinHours(p provider.Provider) bool {
+	if p.Account == nil {
+		return true
+	}
+	_, shut := p.HoursGate(p.Account.User, time.Now())
+	return !shut
 }
 
 // withModel is a request body asking for another model.

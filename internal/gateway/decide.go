@@ -441,14 +441,25 @@ func (s *Server) serveSystemOne(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if p.Account == nil && p.Key != "" {
-			kept := false
+			kept, closed := false, false
 			for _, k := range p.KeysOn() {
-				if q := p.WithKey(k); accountAllowed(accWho, candidate{p: q, model: model}) && p.AccountServes(q.AccountID(), model) {
-					p, kept = q, true
-					break
+				q := p.WithKey(k)
+				if !accountAllowed(accWho, candidate{p: q, model: model}) || !p.AccountServes(q.AccountID(), model) {
+					continue
 				}
+				if _, shut := p.HoursGate(provider.KeyID(k.Key), time.Now()); shut {
+					closed = true
+					continue
+				}
+				p, kept = q, true
+				break
 			}
 			if !kept {
+				if closed {
+					msg, _ := closedProvider(p, asked)
+					writeError(w, provider.Chat, http.StatusTooManyRequests, msg)
+					return
+				}
 				writeError(w, provider.Chat, http.StatusForbidden, keyAccountsError(accWho, asked))
 				return
 			}

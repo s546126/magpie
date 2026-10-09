@@ -570,13 +570,26 @@ func (s *Server) videosCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	// held to some accounts (#905): sent on a key the calling key may use,
 	// of those in use — not the provider's first alone, which a key held
-	// to a later one was refused by — or none, refused
+	// to a later one was refused by — or none, refused. A key outside its
+	// hours is passed over the same way a draw is (hours.go).
+	base := p
 	if keyWho, held := accountHolds(r); held {
 		var ok bool
-		if p, ok = allowedKey(keyWho, p, model); !ok {
+		if p, ok = allowedKey(keyWho, base, model); !ok {
+			if _, open := base.FirstOpen(time.Now()); !open && (base.Key != "" || base.Account != nil) {
+				msg, _ := closedProvider(base, f.Model)
+				fail(429, msg)
+				return
+			}
 			fail(403, keyAccountsError(keyWho, f.Model))
 			return
 		}
+	} else if q, ok := base.FirstOpen(time.Now()); ok {
+		p = q
+	} else if base.Key != "" || base.Account != nil {
+		msg, _ := closedProvider(base, f.Model)
+		fail(429, msg)
+		return
 	}
 	call.Provider, call.To = p.ID, provider.Chat
 	remote := p.IsRemoteMagpie()

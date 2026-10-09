@@ -219,6 +219,11 @@ magpie provider models deepseek a b c   # the whole list of models to expose, re
 magpie provider refresh deepseek        # re-fetch it, and drop picks it no longer has (the TUI: m)
 magpie provider test deepseek           # one tiny request per API, with latency
 magpie provider key deepseek sk-…       # replace the key
+magpie provider hours deepseek all preset deepseek-offpeak
+                                    # every account and key takes requests only in DeepSeek's off-peak hours
+                                    # (peak is 01:00–04:00 and 06:00–10:00 UTC, Monday–Friday).
+                                    # active 09:00-18:00 is on only then; off 22:00-06:00 is off overnight.
+                                    # The account stays saved; routing skips it while the window is closed.
 magpie provider rm deepseek
 magpie models                           # the catalog agents see
 magpie claude deepseek/deepseek-chat    # use it
@@ -894,7 +899,9 @@ result for every request: who went first, and why.
 
 1. **Who can answer.** The account the agent is signed in to, unless it
    is paused, and the other accounts that are ticked. An account set not
-   to serve the model, or held at its usage cap, is never tried. An account whose plan doesn't list the model (a Free one behind a
+   to serve the model, held at its usage cap, or outside the hours set on
+   it (`magpie provider hours`) is never tried. It stays saved, and it is
+   used again when the window opens. An account whose plan doesn't list the model (a Free one behind a
    Plus) is tried only when no other lists it. A Claude account that has to
    be signed in again stays in the list, but is passed over when its turn
    comes, without resting.

@@ -1585,6 +1585,21 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request, from provider.Pro
 		turnedAway()
 		return
 	}
+	if len(cands) == 0 && slices.ContainsFunc(pl.left, func(w Weighed) bool { return w.Closed }) &&
+		!slices.ContainsFunc(pl.left, func(w Weighed) bool {
+			return !w.Barred && !w.Held && !w.Closed && w.Capped == 0
+		}) {
+		// every account or key there is is outside its hours, or barred,
+		// held or capped beside one that is
+		msg, back := closedError(call.Model, pl.left)
+		if d := time.Until(back); d > 0 {
+			w.Header().Set("Retry-After", strconv.Itoa(int(d.Seconds())+1))
+		}
+		call.Status, call.Error = 429, "every account outside its hours"
+		writeError(w, from, 429, msg)
+		turnedAway()
+		return
+	}
 	if len(cands) == 0 {
 		call.Status, call.Error = 404, "no member ready"
 		writeError(w, from, 404, fmt.Sprintf("none of %s's models is ready", call.Model))
