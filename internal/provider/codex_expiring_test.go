@@ -92,7 +92,8 @@ func TestSpendExpiringCodexResets(t *testing.T) {
 		switch r.URL.Path {
 		case "/backend-api/wham/usage":
 			read.Add(1)
-			json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro",
+			// plus keeps the five-hour window beside the week; Pro would drop it
+			json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus",
 				"rate_limit": map[string]any{
 					"primary_window":   map[string]any{"used_percent": 0, "limit_window_seconds": 18000},
 					"secondary_window": map[string]any{"used_percent": 35, "limit_window_seconds": 604800, "reset_at": time.Now().Add(72 * time.Hour).Unix()}},

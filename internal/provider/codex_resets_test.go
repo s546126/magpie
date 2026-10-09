@@ -22,7 +22,8 @@ func fakeCodexResets(t *testing.T, count int, details any) *atomic.Int32 {
 		}
 		switch r.URL.Path {
 		case "/backend-api/wham/usage":
-			body := map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+			// plus keeps the five-hour window this counts; Pro would drop it
+			body := map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 				"primary_window": map[string]any{"used_percent": 64, "limit_window_seconds": 18000}}}
 			if count >= 0 {
 				body["rate_limit_reset_credits"] = map[string]any{"available_count": count}

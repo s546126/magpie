@@ -116,7 +116,8 @@ func TestLoginUsageEachAccount(t *testing.T) {
 			w.WriteHeader(404)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+		// plus keeps the five-hour window these accounts are read by; Pro would drop it
+		json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 			"primary_window": map[string]any{"used_percent": used[r.Header.Get("chatgpt-account-id")], "limit_window_seconds": 18000}}})
 	}))
 	defer fake.Close()
@@ -170,7 +171,7 @@ func TestLoginUsageMixedCache(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+		json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 			"primary_window": map[string]any{"used_percent": 12, "limit_window_seconds": 18000}}})
 	}))
 	defer fake.Close()
@@ -208,7 +209,7 @@ func TestSubscriptionUsageEachAccount(t *testing.T) {
 			w.WriteHeader(404)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+		json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 			"primary_window": map[string]any{"used_percent": used[r.Header.Get("chatgpt-account-id")], "limit_window_seconds": 18000}}})
 	}))
 	defer fake.Close()
@@ -259,7 +260,7 @@ func TestLoginUsageSharedWithUsagePage(t *testing.T) {
 		asked[r.Header.Get("chatgpt-account-id")]++
 		mu.Unlock()
 		// each reading its own, so two are told apart
-		json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+		json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 			"primary_window": map[string]any{"used_percent": n.Add(1), "limit_window_seconds": 18000}}})
 	}))
 	defer fake.Close()
@@ -321,7 +322,7 @@ func TestLoginUsageReadOnceAtATime(t *testing.T) {
 		case <-hold:
 		case <-r.Context().Done():
 		}
-		json.NewEncoder(w).Encode(map[string]any{"plan_type": "pro", "rate_limit": map[string]any{
+		json.NewEncoder(w).Encode(map[string]any{"plan_type": "plus", "rate_limit": map[string]any{
 			"primary_window": map[string]any{"used_percent": n, "limit_window_seconds": 18000}}})
 	}))
 	t.Cleanup(fake.Close)

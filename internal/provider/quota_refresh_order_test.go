@@ -238,7 +238,8 @@ func TestRefreshUsageKeepsNewerSubscription(t *testing.T) {
 					w.WriteHeader(http.StatusServiceUnavailable)
 					return
 				}
-				fmt.Fprintf(w, `{"plan_type":"pro","rate_limit":{"primary_window":{"used_percent":%d,"limit_window_seconds":18000}}}`, value)
+				// plus keeps the five-hour window this counts; Pro would drop it
+				fmt.Fprintf(w, `{"plan_type":"plus","rate_limit":{"primary_window":{"used_percent":%d,"limit_window_seconds":18000}}}`, value)
 			}))
 			t.Cleanup(srv.Close)
 			old := CodexBase
