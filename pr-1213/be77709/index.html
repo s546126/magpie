@@ -1,0 +1,15 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#1213 界面预览 · be77709</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#1213 界面预览</h1><p class="m">commit be77709 · <a href="https://github.com/yetone/magpie/pull/1213">回到 PR</a> · 只改 app.js：用鼠标按住页面自己的滚动条（指针落在 .view 的滚动条带内）时把它记为一次读者的滚动，拖动期间的 scroll 不再被「回到读者位置」机制拉回；按下滚动条同时放开点击后的 4 秒保持，并在松手后再给读者的窗口留 250ms，接住 WebKit 松手之后才到的最后几次 scroll。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-gateway-page-top.png" alt="网关页顶部：页面比窗口高，右侧是这一页的滚动条"><figcaption>网关页：页面自己的滚动条 · 网关页顶部：页面比窗口高，右侧是这一页的滚动条</figcaption></figure>
+<figure><img src="02-gateway-page-lower.png" alt="同一个页面滚到下方之后的位置"><figcaption>网关页：页面自己的滚动条 · 同一个页面滚到下方之后的位置</figcaption></figure>
+<figure><img src="03-routing-page-top.png" alt="路由页顶部：右侧也是它自己的滚动条"><figcaption>点击页面里的文字之后再滚动 · 路由页顶部：右侧也是它自己的滚动条</figcaption></figure>
+<figure><img src="04-routing-page-ctx.png" alt="点击之后滚到下方上下文窗口的页面"><figcaption>点击页面里的文字之后再滚动 · 点击之后滚到下方上下文窗口的页面</figcaption></figure>
+</main></html>

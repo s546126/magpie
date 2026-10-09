@@ -1,0 +1,56 @@
+{
+  "summary": "会话页顶部新增一个默认关闭的「记录网关对话」开关和一个清空按钮，开关与清空都先弹确认弹窗；网关账本会按会话聚合进会话列表，正文来源标注为网关记录；网关模式不再隐藏会话页，只隐藏 Agent 和资源库（连带设置里的说明文字也改了）。",
+  "scenes": [
+    {
+      "title": "会话页的记录开关与确认弹窗",
+      "shots": [
+        {
+          "file": "01-sessions-recording-off.png",
+          "caption": "会话页顶部的记录开关，默认关闭",
+          "width": 2560
+        },
+        {
+          "file": "02-recording-consent.png",
+          "caption": "开启记录前的确认弹窗",
+          "width": 1120
+        },
+        {
+          "file": "03-sessions-recording-on.png",
+          "caption": "确认后的记录开关",
+          "width": 2560
+        },
+        {
+          "file": "04-clear-consent.png",
+          "caption": "清空前的确认弹窗，尚未确认",
+          "width": 1120
+        }
+      ]
+    },
+    {
+      "title": "网关模式保留会话标签",
+      "shots": [
+        {
+          "file": "05-gateway-mode-row.png",
+          "caption": "设置 › 通用里的网关模式说明",
+          "width": 2492
+        },
+        {
+          "file": "06-nav-with-gateway-mode.png",
+          "caption": "切到「开启」后的标签栏",
+          "width": 1120
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "会话页的记录开关与确认弹窗 · shot .sm-recording: nothing visible matches .sm-recording (0 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "沙盒里本机会话文件优先于网关投影，没有只存在于网关账本的会话，也没有已捕获的网关正文，因此「网关会话在列表中只读展示」「网关正文里的提示词/工具调用/工具结果/助手回复」以及清空后的正文空状态在本沙盒中无法复现；会话页只能展示开关本身和两个确认弹窗。",
+  "interactive": true,
+  "pages": 2
+}

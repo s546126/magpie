@@ -1,0 +1,18 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#704 界面预览 · d53602a</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#704 界面预览</h1><p class="m">commit d53602a · <a href="https://github.com/yetone/magpie/pull/704">回到 PR</a> · 在用量页顶部新增「分析」入口，打开新的质量与分析看板：可按今天/7天/30天/全部与全部/按模型/按供应商/按Agent维度查看错误率、异常趋势、TTFT、TPS、成本与缓存率，并可点击排行或 KPI 下钻到调用列表、在同一页右侧内联查看某条调用的路由过程。账号打码也扩展到分析页（含 title 与 aria-label），并新增下钻页的「隐藏账号」按钮。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-usage-analytics-entry.png" alt="用量页顶部新增的「分析」入口"><figcaption>用量页入口与分析看板 · 用量页顶部新增的「分析」入口</figcaption></figure>
+<figure><img src="02-analytics-dashboard.png" alt="打开后的分析看板：周期、维度、筛选与可靠性指标"><figcaption>用量页入口与分析看板 · 打开后的分析看板：周期、维度、筛选与可靠性指标</figcaption></figure>
+<figure><img src="03-analytics-charts-lower.png" alt="向下滚动看到的响应速度与费用、缓存指标"><figcaption>用量页入口与分析看板 · 向下滚动看到的响应速度与费用、缓存指标</figcaption></figure>
+<figure><img src="04-analytics-by-model.png" alt="按模型维度的排行图表"><figcaption>用量页入口与分析看板 · 按模型维度的排行图表</figcaption></figure>
+<figure><img src="05-analytics-drill-page.png" alt="下钻页：左侧紧凑排行，右侧按该指标排序的调用"><figcaption>下钻页、调用路由与账号打码 · 下钻页：左侧紧凑排行，右侧按该指标排序的调用</figcaption></figure>
+<figure><img src="06-analytics-inline-routing.png" alt="同一页右侧显示这条调用的路由过程"><figcaption>下钻页、调用路由与账号打码 · 同一页右侧显示这条调用的路由过程</figcaption></figure>
+<figure><img src="07-analytics-drill-masked.png" alt="下钻页上的「隐藏账号」按钮"><figcaption>下钻页、调用路由与账号打码 · 下钻页上的「隐藏账号」按钮</figcaption></figure>
+</main></html>

@@ -1,0 +1,61 @@
+{
+  "summary": "在用量页顶部新增「分析」入口，打开新的质量与分析看板：可按今天/7天/30天/全部与全部/按模型/按供应商/按Agent维度查看错误率、异常趋势、TTFT、TPS、成本与缓存率，并可点击排行或 KPI 下钻到调用列表、在同一页右侧内联查看某条调用的路由过程。账号打码也扩展到分析页（含 title 与 aria-label），并新增下钻页的「隐藏账号」按钮。",
+  "scenes": [
+    {
+      "title": "用量页入口与分析看板",
+      "shots": [
+        {
+          "file": "01-usage-analytics-entry.png",
+          "caption": "用量页顶部新增的「分析」入口",
+          "width": 2560
+        },
+        {
+          "file": "02-analytics-dashboard.png",
+          "caption": "打开后的分析看板：周期、维度、筛选与可靠性指标",
+          "width": 2560
+        },
+        {
+          "file": "03-analytics-charts-lower.png",
+          "caption": "向下滚动看到的响应速度与费用、缓存指标",
+          "width": 2560
+        },
+        {
+          "file": "04-analytics-by-model.png",
+          "caption": "按模型维度的排行图表",
+          "width": 2560
+        }
+      ]
+    },
+    {
+      "title": "下钻页、调用路由与账号打码",
+      "shots": [
+        {
+          "file": "05-analytics-drill-page.png",
+          "caption": "下钻页：左侧紧凑排行，右侧按该指标排序的调用",
+          "width": 2560
+        },
+        {
+          "file": "06-analytics-inline-routing.png",
+          "caption": "同一页右侧显示这条调用的路由过程",
+          "width": 2560
+        },
+        {
+          "file": "07-analytics-drill-masked.png",
+          "caption": "下钻页上的「隐藏账号」按钮",
+          "width": 2560
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "下钻页、调用路由与账号打码 · click #rtBackAnalytics: nothing visible matches #rtBackAnalytics (0 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "描述称点击调用后右侧切换为单列 KV 详情，diff 里点击调用是在右侧内联挂载路由过程（带「返回分析列表」），并没有单列 KV 详情视图；描述称 TPS 被排除的样本数会在界面上显示，diff 只显示有效解码样本数，没有单独列出被排除的样本数。",
+  "unseen": "录制窗口固定 1280×800，无法验证描述里 659px 窄窗口仍保持左右两栏、无横向溢出；界面上「隐藏账号」的实际打码效果取决于本地记录里是否出现邮箱式账号；零价/未计价模型的分开展示也取决于沙箱是否存在未定价模型。",
+  "interactive": true,
+  "pages": 1
+}

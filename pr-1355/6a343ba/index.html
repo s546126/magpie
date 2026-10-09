@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#1355 界面预览 · 6a343ba</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#1355 界面预览</h1><p class="m">commit 6a343ba · <a href="https://github.com/yetone/magpie/pull/1355">回到 PR</a> · 会话页顶部新增一个默认关闭的「记录网关对话」开关和一个清空按钮，开关与清空都先弹确认弹窗；网关账本会按会话聚合进会话列表，正文来源标注为网关记录；网关模式不再隐藏会话页，只隐藏 Agent 和资源库（连带设置里的说明文字也改了）。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-sessions-recording-off.png" alt="会话页顶部的记录开关，默认关闭"><figcaption>会话页的记录开关与确认弹窗 · 会话页顶部的记录开关，默认关闭</figcaption></figure>
+<figure><img src="02-recording-consent.png" alt="开启记录前的确认弹窗"><figcaption>会话页的记录开关与确认弹窗 · 开启记录前的确认弹窗</figcaption></figure>
+<figure><img src="03-sessions-recording-on.png" alt="确认后的记录开关"><figcaption>会话页的记录开关与确认弹窗 · 确认后的记录开关</figcaption></figure>
+<figure><img src="04-clear-consent.png" alt="清空前的确认弹窗，尚未确认"><figcaption>会话页的记录开关与确认弹窗 · 清空前的确认弹窗，尚未确认</figcaption></figure>
+<figure><img src="05-gateway-mode-row.png" alt="设置 › 通用里的网关模式说明"><figcaption>网关模式保留会话标签 · 设置 › 通用里的网关模式说明</figcaption></figure>
+<figure><img src="06-nav-with-gateway-mode.png" alt="切到「开启」后的标签栏"><figcaption>网关模式保留会话标签 · 切到「开启」后的标签栏</figcaption></figure>
+</main></html>

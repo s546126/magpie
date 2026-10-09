@@ -1,0 +1,46 @@
+{
+  "summary": "在「设置 › 常规」新增一行「Codex 会话描述」，可选择让 Codex 的 thread_description 请求走 Codex 自带（ChatGPT）还是指定某个 magpie 模型/路由组；同时把 thread_description 记为独立的「描述」用途，供用量与路由视图识别。",
+  "scenes": [
+    {
+      "title": "设置里的「Codex 会话描述」行与模型选择",
+      "shots": [
+        {
+          "file": "01-settings-description-row.png",
+          "caption": "「Codex 会话描述」行在读设置里的样子",
+          "width": 2492
+        },
+        {
+          "file": "02-description-picker-open.png",
+          "caption": "展开的选择器：Codex 自带（ChatGPT）与可选模型",
+          "width": 2560
+        },
+        {
+          "file": "03-description-row-after-pick.png",
+          "caption": "选定之后这一行的显示",
+          "width": 2492
+        }
+      ]
+    },
+    {
+      "title": "用量里按用途区分请求的位置",
+      "shots": [
+        {
+          "file": "04-usage-requests-purpose.png",
+          "caption": "用量 › 请求：按用途筛选请求的地方",
+          "width": 2560
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "设置里的「Codex 会话描述」行与模型选择 · click button: nothing visible matches button with \"Coding\" (2 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "沙盒没有真实的 Codex thread_description 请求，用量/路由列表里不会出现「描述」这一用途的记录，也无法从浏览器触发一次描述请求来验证它是否真的改由所选模型生成（需要真正的 Codex 客户端）。",
+  "interactive": true,
+  "pages": 2
+}

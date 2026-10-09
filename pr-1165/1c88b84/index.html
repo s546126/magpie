@@ -1,0 +1,19 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>#1165 界面预览 · 1c88b84</title>
+<style>:root{color-scheme:light dark;--bg:#f6f6f7;--fg:#1d1d1f;--muted:#6e6e73;--card:#fff;--line:#e5e5ea}
+@media (prefers-color-scheme:dark){:root{--bg:#111113;--fg:#f2f2f4;--muted:#9a9aa0;--card:#1c1c1f;--line:#2c2c30}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Noto Sans CJK SC",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}h1{font-size:20px;margin:0 0 4px}.m{color:var(--muted);font-size:13px;margin:0 0 20px}
+video,img{display:block;width:100%;border-radius:10px;border:1px solid var(--line);background:var(--card)}figure{margin:0 0 28px}figcaption{color:var(--muted);font-size:13px;margin-top:8px}
+a{color:inherit}</style>
+<main><h1>#1165 界面预览</h1><p class="m">commit 1c88b84 · <a href="https://github.com/yetone/magpie/pull/1165">回到 PR</a> · 供应商编辑器里，本地预设（Ollama、LM Studio、oMLX）在密钥下方新增了默认折叠的「服务器地址」区块：填入端口或另一台电脑的地址后，终结点预览按新地址改写（各 API 保留自己的路径），地址不是地址时会展开并提示；LM Studio 与 oMLX 的说明文字也改成了「默认端口 1234/8000」。</p>
+<figure><video src="preview.mp4" controls autoplay muted playsinline poster="poster.png"></video><figcaption>红线是鼠标走过的轨迹，红色圆环是一次点击；底部文字是这一步在做什么。空格暂停，← → 逐段查看。</figcaption></figure>
+<figure><img src="01-add-sheet-local-presets.png" alt="添加面板里的预设"><figcaption>本地预设的「服务器地址」与无效地址提示 · 添加面板里的预设</figcaption></figure>
+<figure><img src="02-editor-address-folded.png" alt="本地预设的编辑器：密钥下方的「服务器地址」"><figcaption>本地预设的「服务器地址」与无效地址提示 · 本地预设的编辑器：密钥下方的「服务器地址」</figcaption></figure>
+<figure><img src="03-editor-address-folded.png" alt="本地预设的编辑器：密钥下方的「服务器地址」"><figcaption>本地预设的「服务器地址」与无效地址提示 · 本地预设的编辑器：密钥下方的「服务器地址」</figcaption></figure>
+<figure><img src="04-editor-address-open.png" alt="展开后的地址输入框与终结点预览"><figcaption>本地预设的「服务器地址」与无效地址提示 · 展开后的地址输入框与终结点预览</figcaption></figure>
+<figure><img src="05-editor-address-refused.png" alt="点「添加」后的编辑器"><figcaption>本地预设的「服务器地址」与无效地址提示 · 点「添加」后的编辑器</figcaption></figure>
+<figure><img src="06-editor-address-typed.png" alt="填入地址后的编辑器与终结点预览"><figcaption>改到另一台电脑的地址后添加并重新打开 · 填入地址后的编辑器与终结点预览</figcaption></figure>
+<figure><img src="07-providers-after-add.png" alt="添加完成后的供应商列表"><figcaption>改到另一台电脑的地址后添加并重新打开 · 添加完成后的供应商列表</figcaption></figure>
+<figure><img src="08-editor-address-reopened.png" alt="重新打开时的「服务器地址」"><figcaption>改到另一台电脑的地址后添加并重新打开 · 重新打开时的「服务器地址」</figcaption></figure>
+</main></html>

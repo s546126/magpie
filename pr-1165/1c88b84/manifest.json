@@ -1,0 +1,68 @@
+{
+  "summary": "供应商编辑器里，本地预设（Ollama、LM Studio、oMLX）在密钥下方新增了默认折叠的「服务器地址」区块：填入端口或另一台电脑的地址后，终结点预览按新地址改写（各 API 保留自己的路径），地址不是地址时会展开并提示；LM Studio 与 oMLX 的说明文字也改成了「默认端口 1234/8000」。",
+  "scenes": [
+    {
+      "title": "本地预设的「服务器地址」与无效地址提示",
+      "shots": [
+        {
+          "file": "01-add-sheet-local-presets.png",
+          "caption": "添加面板里的预设",
+          "width": 2496
+        },
+        {
+          "file": "02-editor-address-folded.png",
+          "caption": "本地预设的编辑器：密钥下方的「服务器地址」",
+          "width": 1296
+        },
+        {
+          "file": "03-editor-address-folded.png",
+          "caption": "本地预设的编辑器：密钥下方的「服务器地址」",
+          "width": 1296
+        },
+        {
+          "file": "04-editor-address-open.png",
+          "caption": "展开后的地址输入框与终结点预览",
+          "width": 1296
+        },
+        {
+          "file": "05-editor-address-refused.png",
+          "caption": "点「添加」后的编辑器",
+          "width": 1296
+        }
+      ]
+    },
+    {
+      "title": "改到另一台电脑的地址后添加并重新打开",
+      "shots": [
+        {
+          "file": "06-editor-address-typed.png",
+          "caption": "填入地址后的编辑器与终结点预览",
+          "width": 1296
+        },
+        {
+          "file": "07-providers-after-add.png",
+          "caption": "添加完成后的供应商列表",
+          "width": 2496
+        },
+        {
+          "file": "08-editor-address-reopened.png",
+          "caption": "重新打开时的「服务器地址」",
+          "width": 1296
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [
+    "本地预设的「服务器地址」与无效地址提示 · click details.more > summary: nothing visible matches details.more > summary with \"服务器地址\" (0 in the page)",
+    "改到另一台电脑的地址后添加并重新打开 · click #addProvider: nothing visible matches #addProvider (1 in the page)",
+    "改到另一台电脑的地址后添加并重新打开 · type input.address: nothing visible matches input.address (1 in the page)"
+  ],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "TUI 的改动（新增本地预设时先问地址、w 改地址、底部提示）和 CLI 用法示例都只在终端里，浏览器沙盒看不到；沙盒里原本没有本地预设，也没有真正的 Ollama / LM Studio / oMLX 服务，所以「保存的地址不是默认值时区块默认展开」只能用新添加的供应商复现，真正连到另一台电脑或另一个端口的服务、以及 Test / 刷新在保存前用新地址去连，都无法在这里验证。",
+  "interactive": true,
+  "pages": 1
+}

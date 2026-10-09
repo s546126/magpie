@@ -1,0 +1,44 @@
+{
+  "summary": "只改 app.js：用鼠标按住页面自己的滚动条（指针落在 .view 的滚动条带内）时把它记为一次读者的滚动，拖动期间的 scroll 不再被「回到读者位置」机制拉回；按下滚动条同时放开点击后的 4 秒保持，并在松手后再给读者的窗口留 250ms，接住 WebKit 松手之后才到的最后几次 scroll。",
+  "scenes": [
+    {
+      "title": "网关页：页面自己的滚动条",
+      "shots": [
+        {
+          "file": "01-gateway-page-top.png",
+          "caption": "网关页顶部：页面比窗口高，右侧是这一页的滚动条",
+          "width": 2560
+        },
+        {
+          "file": "02-gateway-page-lower.png",
+          "caption": "同一个页面滚到下方之后的位置",
+          "width": 2560
+        }
+      ]
+    },
+    {
+      "title": "点击页面里的文字之后再滚动",
+      "shots": [
+        {
+          "file": "03-routing-page-top.png",
+          "caption": "路由页顶部：右侧也是它自己的滚动条",
+          "width": 2560
+        },
+        {
+          "file": "04-routing-page-ctx.png",
+          "caption": "点击之后滚到下方上下文窗口的页面",
+          "width": 2560
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "",
+  "unseen": "录制步骤里没有「按住并拖动滚动条」这个手势，只能用普通滚动把页面滚到不同位置，所以本次修复的关键动作本身（鼠标拖动滚动条滑块、点完页面再拖、松手之后才到达的 scroll）无法在录像里还原；这里只展示会出现该问题的长页面以及它滚动前后的位置。",
+  "interactive": true,
+  "pages": 2
+}

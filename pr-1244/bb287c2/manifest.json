@@ -1,0 +1,44 @@
+{
+  "summary": "本 PR 只在 internal/gui/assets/i18n.js 里为 ZCode 插件领取提示的窗口名称「Gift plans to claim in the ZCode app」补上简体中文、繁体中文、日语、德语四条译文（外加测试与 README），界面其他部分没有改动。",
+  "scenes": [
+    {
+      "title": "额度卡片上的窗口名称",
+      "shots": [
+        {
+          "file": "01-usage-allowances.png",
+          "caption": "用量 › 额度：各账号的额度窗口名称与用量都显示在卡片上",
+          "width": 2560
+        }
+      ]
+    },
+    {
+      "title": "切换界面语言",
+      "shots": [
+        {
+          "file": "02-settings-language.png",
+          "caption": "设置 › 常规：界面语言在这里选择",
+          "width": 1120
+        },
+        {
+          "file": "03-settings-ja.png",
+          "caption": "点完「日本語」后的设置页",
+          "width": 1120
+        },
+        {
+          "file": "04-usage-ja.png",
+          "caption": "日本語界面下的用量 › 额度，窗口名称随界面语言显示",
+          "width": 2560
+        }
+      ]
+    }
+  ],
+  "video": "preview.mp4",
+  "poster": "poster.png",
+  "errors": [],
+  "leak": false,
+  "skipped": null,
+  "mismatch": "描述说「插件现在把句子作为窗口名、把数量和方案名作为 display」，那属于 plugins#43，本 diff 只加了四条 i18n 名称，没有任何界面结构或行为改动；描述表格里列出的四条译文（如 zh 的「有赠送额度待领取 · 请在 ZCode 客户端领取」、de 的「Geschenk-Kontingente zum Abholen in der ZCode-App」）与 diff 中实际写入的文案（zh「待在 ZCode 客户端领取的赠送额度」、zh-TW「待在 ZCode 用戶端領取的贈送額度」、ja「ZCode アプリで受け取れるギフト枠」、de「In der ZCode-App abzuholen」）不一致。",
+  "unseen": "沙盒没有 ZCode 插件，也没有名为「Gift plans to claim in the ZCode app」的额度窗口（只有已登录的 Codex 账号与本地供应商），所以这四条新增译文在界面上无法显示；只能展示该名称会出现的用量 › 额度卡片位置，以及界面语言切换本身。",
+  "interactive": true,
+  "pages": 4
+}
